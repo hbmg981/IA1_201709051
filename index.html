@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de Modelos</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333; /* Color de texto general */
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            color: #333; /* Color del título */
+        }
+
+        h2 {
+            margin: 0;
+            color: #333; /* Color de los subtítulos */
+        }
+
+        nav {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 2px solid #b69ad09c; /* Marco lila */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #892be24a; /* Borde lila */
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #8907a3ba; /* Color de fondo lila */
+            color: white; /* Color del texto en el botón */
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #7a1d9e; /* Color más oscuro al pasar el mouse */
+        }
+
+        p {
+            color: #555; /* Color del texto */
+        }
+    </style>
+</head>
+<body>
+    <h1>Modelos de Machine Learning Utilizando Tytus.js</h1>
+    <h2>Laboratorio de Inteligencia Artificial 1</h2>
+    <h2>201709051</h2>
+    <nav>
+        <label for="modelSelect">Selecciona un modelo:</label>
+        <select id="modelSelect">
+            <option value="">-- Elige un modelo --</option>
+            <option value="modelos/Regresion_lineal.html">Regresión Lineal</option>
+            <option value="modelos/Regresion_polinomial.html">Regresión Polinomial</option>
+            <option value="modelos/Arbol_decision.html">Árbol de Decisión</option>
+        </select>
+        <button onclick="goToModel()">Ver Modelo</button>
+    </nav>
+
+    <p>Selecciona un modelo para verlo en una nueva pestaña.</p>
+
+    <script>
+        function goToModel() {
+            const select = document.getElementById('modelSelect');
+            const selectedValue = select.value;
+            if (selectedValue) {
+                window.open(selectedValue, '_blank');
+            } else {
+                alert("Por favor, selecciona un modelo.");
+            }
+        }
+    </script>
+</body>
+</html>
