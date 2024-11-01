@@ -1,0 +1,134 @@
+[
+    {
+        "Temperature": "Cold",
+        "Humidity": "High",
+        "Wind": "Weak",
+        "Pressure": "Low",
+        "Visibility": "Poor",
+        "Cloudy": "Yes",
+        "Season": "Winter",
+        "Weather": "Snowy",
+        "Play": "No"
+    },
+    {
+        "Temperature": "Cold",
+        "Humidity": "High",
+        "Wind": "Strong",
+        "Pressure": "Low",
+        "Visibility": "Poor",
+        "Cloudy": "Yes",
+        "Season": "Winter",
+        "Weather": "Snowy",
+        "Play": "No"
+    },
+    {
+        "Temperature": "Mild",
+        "Humidity": "High",
+        "Wind": "Weak",
+        "Pressure": "Normal",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Spring",
+        "Weather": "Sunny",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Mild",
+        "Humidity": "High",
+        "Wind": "Strong",
+        "Pressure": "Normal",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Spring",
+        "Weather": "Sunny",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Hot",
+        "Humidity": "Normal",
+        "Wind": "Weak",
+        "Pressure": "High",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Summer",
+        "Weather": "Sunny",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Hot",
+        "Humidity": "Normal",
+        "Wind": "Strong",
+        "Pressure": "High",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Summer",
+        "Weather": "Sunny",
+        "Play": "No"
+    },
+    {
+        "Temperature": "Hot",
+        "Humidity": "High",
+        "Wind": "Weak",
+        "Pressure": "Low",
+        "Visibility": "Moderate",
+        "Cloudy": "Yes",
+        "Season": "Summer",
+        "Weather": "Humid",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Mild",
+        "Humidity": "Normal",
+        "Wind": "Weak",
+        "Pressure": "Normal",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Spring",
+        "Weather": "Sunny",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Cold",
+        "Humidity": "Normal",
+        "Wind": "Weak",
+        "Pressure": "High",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Winter",
+        "Weather": "Clear",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Mild",
+        "Humidity": "Normal",
+        "Wind": "Strong",
+        "Pressure": "Normal",
+        "Visibility": "Good",
+        "Cloudy": "No",
+        "Season": "Spring",
+        "Weather": "Sunny",
+        "Play": "Yes"
+    },
+    {
+        "Temperature": "Hot",
+        "Humidity": "High",
+        "Wind": "Strong",
+        "Pressure": "Low",
+        "Visibility": "Poor",
+        "Cloudy": "Yes",
+        "Season": "Summer",
+        "Weather": "Stormy",
+        "Play": "No"
+    },
+    {
+        "Temperature": "Mild",
+        "Humidity": "High",
+        "Wind": "Strong",
+        "Pressure": "Normal",
+        "Visibility": "Good",
+        "Cloudy": "Yes",
+        "Season": "Spring",
+        "Weather": "Rainy",
+        "Play": "No"
+    }
+]

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regresión Polinómica</title>
+    <script src="../dist/tytus.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        // Carga de la biblioteca de Google Charts
+        google.charts.load('current', { packages: ['corechart'] });
+    </script>
+    <style>
+        #curve_chart {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+        }
+
+        .file-input {
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #5c85d6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4a70b2;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #log {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        #chart_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+        }
+
+        #table_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #5c85d6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>Regresión Polinómica</h1>
+        <div style="width: 100%; justify-content: center; display: flex; flex-wrap: wrap;">
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
+                <div class="file-input" style="width: 60%;">
+                    <div style="width: 90%;">
+                        <input type="file" id="fileInput" accept=".json, .csv" />
+                        <button id="loadButton">Cargar Datos</button>
+                    </div>
+                </div>
+                <div style="width: 90%;">
+                    <h2>Datos</h2>
+                    <table style="width: 60%; margin: auto;">
+                        <tr>
+                            <th>X Train</th>
+                            <th>Y Train</th>
+                        </tr>
+                        <tbody id="dataTableBody">
+                            <!-- Las filas se agregarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; width: 80%;">
+            <div style="width: 60%;">
+                <h2>Configuraciones</h2>
+                <div style="width: 60%; font-size: 1em; margin: 15px 0;">
+                    <label for="degree" style="font-weight: bold; font-size: 1em;">Grado del Polinomio:</label>
+                    <select id="degree"
+                        style="width: 100%; padding: 10px; font-size: 1.2em; border-radius: 5px; border: 1px solid #ccc;">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <div style="width: 50%;">
+                    <button id="trainButton">Entrenar Modelo</button>
+                    <button id="viewChartButton">Ver Gráfica</button>
+                </div>
+
+            </div>
+            <div style="width: 40%;">
+                <div style="width: 70%;">
+                    <label for="newXValue">Nuevo valor de X para predicción:</label>
+                    <input type="number" id="newXValue" placeholder="Ej. 10" />
+                    <button id="predictButton">Predecir</button>
+                    <label>Valores Predichos:</label>
+                    <table id="predictedValueTable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Grado</th>
+                                <th>Valor Predicho</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se agregarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="width: 100%; justify-content: center; display: flex; flex-wrap: wrap;">
+
+            <div style="width: 45%;">
+                <div style="width: 100%; display: flex; justify-content: flex-end; flex-wrap: wrap;">
+                    <h2 style="width: 90%;">Datos Predichos</h2>
+                    <table id="displayTable" style="width: 98%;">
+                        <thead>
+                            <tr>
+                                <th>X Base</th>
+                                <th>Grado 2</th>
+                                <th>Grado 3</th>
+                                <th>Grado 4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se agregarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <label>Error:</label>
+                <table id="errorTable" style="width: 50%;">
+                    <thead>
+                        <tr>
+                            <th>Grado</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas se agregarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="width: 55%; display: flex; justify-content: center; flex-wrap: wrap;">
+                <h2>Gráfica de Regresión Polinómica</h2>
+                <div id="curve_chart"></div>
+            </div>
+        </div>
+
+    </center>
+
+    <script>
+        let xValues = [];
+        let yValues = [];
+        let polynomialModel;
+
+        function updateDataTables() {
+            const dataTableBody = document.getElementById("dataTableBody");
+            dataTableBody.innerHTML = ""; // Limpiar la tabla existente
+
+            for (let i = 0; i < xValues.length; i++) {
+                let row = document.createElement("tr");
+                let xCol = document.createElement("td");
+                xCol.innerText = xValues[i].toString();
+                let yCol = document.createElement("td");
+                yCol.innerText = yValues[i].toString();
+                row.appendChild(xCol);
+                row.appendChild(yCol);
+                dataTableBody.appendChild(row);
+            }
+        }
+
+        function drawFullRegression() {
+            polynomialModel = new PolynomialRegression();
+            let grades = {};
+            const degreeI = parseInt(document.getElementById("degree").value);
+
+            var predictArray = xValues;
+            var polynomial = new PolynomialRegression();
+
+            // Array para almacenar los errores para cada grado
+            let errors = [];
+
+            // Calcular predicciones y errores para cada grado desde 2 hasta degreeI
+            for (let degree = 2; degree <= degreeI; degree++) {
+                polynomial.fit(xValues, yValues, degree);
+                let yPredict = polynomial.predict(predictArray);
+                let error = polynomial.getError();
+
+                // Guardar las predicciones y el error correspondiente
+                grades[degree] = yPredict.map(value => Number(value.toFixed(2)));
+                errors.push({ degree: degree, error: Number(error.toFixed(2)) });
+            }
+
+            // Actualizar la tabla de resultados
+            let displayTable = document.getElementById("displayTable").getElementsByTagName('tbody')[0];
+            displayTable.innerHTML = ""; // Limpiar la tabla existente
+
+            for (let i = 0; i < xValues.length; i++) {
+                let row = document.createElement("tr");
+                let xCol = document.createElement("td");
+                xCol.innerText = xValues[i].toString();
+                row.appendChild(xCol);
+
+                for (let degree = 2; degree <= degreeI; degree++) {
+                    let predictedCol = document.createElement("td");
+                    predictedCol.innerText = grades[degree][i].toString();
+                    row.appendChild(predictedCol);
+                }
+                displayTable.appendChild(row);
+            }
+
+            // Actualizar la tabla de errores
+            let errorTable = document.getElementById("errorTable").getElementsByTagName('tbody')[0];
+            errorTable.innerHTML = ""; // Limpiar la tabla de errores existente
+
+            // Agregar los errores a la tabla
+            errors.forEach(err => {
+                let errorRow = document.createElement("tr");
+                let degreeCol = document.createElement("td");
+                degreeCol.innerText = err.degree;
+                errorRow.appendChild(degreeCol);
+
+                let errorCol = document.createElement("td");
+                errorCol.innerText = err.error;
+                errorRow.appendChild(errorCol);
+
+                errorTable.appendChild(errorRow);
+            });
+
+            // Generar gráfico
+            var graphDataSet = [["X", "Y"]]; // Inicializa con X y Y
+
+            // Agrega dinámicamente los títulos según el grado
+            for (let degree = 2; degree <= degreeI; degree++) {
+                graphDataSet[0].push(`Grado ${degree}`);
+            }
+
+            for (let i = 0; i < xValues.length; i++) {
+                const dataRow = [xValues[i], yValues[i]];
+                for (let degree = 2; degree <= degreeI; degree++) {
+                    dataRow.push(grades[degree][i]);
+                }
+                graphDataSet.push(dataRow);
+            }
+
+            var data = google.visualization.arrayToDataTable(graphDataSet);
+
+            var options = {
+                title: "Regresión Polinómica",
+                hAxis: { title: 'X', minValue: 0 },
+                vAxis: { title: 'Y', minValue: 0 },
+                legend: { position: "bottom" },
+                seriesType: 'scatter',
+                series: {
+                    1: { type: 'line' },
+                    2: { type: 'line' },
+                    3: { type: 'line' }
+                }
+            };
+
+            var chart = new google.visualization.ComboChart(document.getElementById("curve_chart"));
+            chart.draw(data, options);
+        }
+
+
+
+        document.getElementById("loadButton").addEventListener("click", function () {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Por favor, selecciona un archivo.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const contents = event.target.result;
+                if (file.type === "application/json") {
+                    const jsonData = JSON.parse(contents);
+                    xValues = jsonData.map(data => data.x);
+                    yValues = jsonData.map(data => data.y);
+                } else {
+                    const rows = contents.split("\n");
+                    for (let row of rows) {
+                        const cols = row.split(",");
+                        xValues.push(parseFloat(cols[0]));
+                        yValues.push(parseFloat(cols[1]));
+                    }
+                }
+                updateDataTables();
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById("trainButton").addEventListener("click", function () {
+            polynomialModel = new PolynomialRegression();
+            const degreeI = parseInt(document.getElementById("degree").value);
+            let grades = {};
+
+            // Calcular y almacenar las predicciones para cada grado
+            for (let degree = 2; degree <= degreeI; degree++) {
+                polynomialModel.fit(xValues, yValues, degree);
+                grades[degree] = polynomialModel.predict(xValues);
+            }
+
+            // Actualizar la tabla de resultados
+            let displayTable = document.getElementById("displayTable").getElementsByTagName('tbody')[0];
+            displayTable.innerHTML = ""; // Limpiar la tabla existente
+
+            for (let i = 0; i < xValues.length; i++) {
+                let row = document.createElement("tr");
+                let xCol = document.createElement("td");
+                xCol.innerText = xValues[i].toString();
+                row.appendChild(xCol);
+
+                for (let degree = 2; degree <= degreeI; degree++) {
+                    let predictedCol = document.createElement("td");
+                    predictedCol.innerText = grades[degree][i].toString();
+                    row.appendChild(predictedCol);
+                }
+                displayTable.appendChild(row);
+            }
+        });
+
+        document.getElementById("predictButton").addEventListener("click", function () {
+            // Obtener el nuevo valor de X
+            const newXValue = parseFloat(document.getElementById("newXValue").value);
+
+            // Comprobar si newXValue es un número válido
+            if (isNaN(newXValue)) {
+                alert("Por favor, introduce un valor numérico válido para X.");
+                return; // Salir de la función si no es válido
+            }
+
+            // Crear una nueva instancia del modelo
+            polynomialModel = new PolynomialRegression();
+            const degreeI = parseInt(document.getElementById("degree").value);
+            let grades = {};
+
+            // Calcular y almacenar las predicciones para cada grado
+            for (let degree = 2; degree <= degreeI; degree++) {
+                polynomialModel.fit(xValues, yValues, degree);
+                grades[degree] = polynomialModel.predict(xValues);
+            }
+
+            // Realizar la predicción para el nuevo valor de X
+            let predictedValues = {};
+            for (let degree = 2; degree <= degreeI; degree++) {
+                polynomialModel.fit(xValues, yValues, degree);
+                predictedValues[degree] = polynomialModel.predict([newXValue]); // Obtener el valor predicho para newXValue
+            }
+
+            // Actualizar la tabla de resultados
+            updatePredictionTable(grades, degreeI); // Llama a la función para actualizar la tabla de predicciones
+            updatePredictedValueTable(predictedValues, degreeI); // Llama a la función para actualizar la tabla de valores predichos
+        });
+
+        document.getElementById("viewChartButton").addEventListener("click", function () {
+            drawFullRegression(); // Llama a la función para dibujar la gráfica con todos los grados
+        });
+
+        function updatePredictionTable(grades, degreeI) {
+            let displayTable = document.getElementById("displayTable").getElementsByTagName('tbody')[0];
+            displayTable.innerHTML = ""; // Limpiar la tabla existente
+
+            for (let i = 0; i < xValues.length; i++) {
+                let row = document.createElement("tr");
+                let xCol = document.createElement("td");
+                xCol.innerText = xValues[i].toString();
+                row.appendChild(xCol);
+
+                for (let degree = 2; degree <= degreeI; degree++) {
+                    let predictedCol = document.createElement("td");
+                    predictedCol.innerText = grades[degree][i].toString();
+                    row.appendChild(predictedCol);
+                }
+                displayTable.appendChild(row);
+            }
+
+            updatePredictedValueTable(grades, degreeI); // Llama a la función para actualizar la tabla de valores predichos
+        }
+
+        function updatePredictedValueTable(grades, degreeI) {
+            const predictedValueTableBody = document.getElementById("predictedValueTable").getElementsByTagName('tbody')[0];
+            predictedValueTableBody.innerHTML = ""; // Limpiar la tabla existente
+
+            for (let degree = 2; degree <= degreeI; degree++) {
+                let row = document.createElement("tr");
+                let degreeCol = document.createElement("td");
+                degreeCol.innerText = `Grado ${degree}`;
+                let predictedCol = document.createElement("td");
+
+                // Verifica si grades[degree] tiene datos
+                if (grades[degree] && grades[degree].length > 0) {
+                    predictedCol.innerText = grades[degree][grades[degree].length - 1].toString(); // Valor de la última predicción
+                } else {
+                    predictedCol.innerText = "N/A"; // Valor no disponible
+                }
+
+                row.appendChild(degreeCol);
+                row.appendChild(predictedCol);
+                predictedValueTableBody.appendChild(row);
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+[
+    {
+        "Income": "High",
+        "WorkTime": "Short",
+        "Married": "No",
+        "Debts": "Yes",
+        "Children": "No",
+        "BuyHouse": "No"
+    },
+    {
+        "Income": "High",
+        "WorkTime": "Long",
+        "Married": "Yes",
+        "Debts": "No",
+        "Children": "No",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "Low",
+        "WorkTime": "Long",
+        "Married": "No",
+        "Debts": "No",
+        "Children": "No",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "Medium",
+        "WorkTime": "Short",
+        "Married": "Yes",
+        "Debts": "No",
+        "Children": "Several",
+        "BuyHouse": "No"
+    },
+    {
+        "Income": "High",
+        "WorkTime": "Short",
+        "Married": "No",
+        "Debts": "No",
+        "Children": "No",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "High",
+        "WorkTime": "Long",
+        "Married": "No",
+        "Debts": "Yes",
+        "Children": "No",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "Medium",
+        "WorkTime": "Long",
+        "Married": "Yes",
+        "Debts": "No",
+        "Children": "One",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "Low",
+        "WorkTime": "Long",
+        "Married": "Yes",
+        "Debts": "Yes",
+        "Children": "One",
+        "BuyHouse": "No"
+    },
+    {
+        "Income": "Low",
+        "WorkTime": "Short",
+        "Married": "No",
+        "Debts": "Yes",
+        "Children": "One",
+        "BuyHouse": "No"
+    },
+    {
+        "Income": "Medium",
+        "WorkTime": "Long",
+        "Married": "Yes",
+        "Debts": "No",
+        "Children": "Several",
+        "BuyHouse": "Yes"
+    },
+    {
+        "Income": "Low",
+        "WorkTime": "Short",
+        "Married": "Yes",
+        "Debts": "Yes",
+        "Children": "Several",
+        "BuyHouse": "No"
+    }
+]

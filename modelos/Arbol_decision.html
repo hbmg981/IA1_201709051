@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árbol de Decisión</title>
+    <script type="text/javascript" src="../dist/tytus.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input[type="file"],
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4a70b2;
+        }
+
+        #log {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        #table_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #5c85d6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
+        <h1>Árbol de Decisión</h1>
+    </div>
+
+
+
+
+
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 70%;">
+                <label for="fileInput">Cargar archivo (CSV o JSON):</label>
+                <input type="file" id="fileInput" accept=".csv, .json">
+                <div style="width: 50%;">
+                    <button id="trainButton">Entrenar Modelo</button>
+                    <button id="showTreeButton">Mostrar Árbol</button>
+                </div>
+            </div>
+        </div>
+        <div style="width: 50%;">
+            <div style="width: 70%;">
+                <!-- Input para la predicción -->
+                <label>Predict</label>
+                <br>
+                <input style="width: 80%;" id="data" type="text" placeholder="Insert data">
+                <br><br>
+                <!-- Botón para ejecutar la predicción -->
+                <button id="predict">Predecir con los datos insertados</button>
+                <br><br>
+                <!-- Elemento para mostrar el resultado de la predicción -->
+                <p id="prediction" style="font-size: 20px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="log">
+        <h2>Resulado</h2>
+        <p id="logText">Resultado de entrenamiento.</p>
+    </div>
+
+    <div id="table_div">
+        <h2>Datos de Entrenamiento</h2>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <!-- Encabezados dinámicos según los datos -->
+                </tr>
+            </thead>
+            <tbody id="dataBody">
+                <!-- Filas dinámicas de los datos -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tree"
+        style="width: 100%; height: 500px; border: 2px solid rgb(96, 160, 255); border-radius: 10px; margin-top: 20px;">
+    </div>
+
+    <script type="text/javascript">
+        let data = []; // Matriz de datos (X + Y)
+        let headers = []; // Encabezados dinámicos para las columnas
+        let decisionTreeModel;
+
+        function loadFileData(fileContent, fileType) {
+            if (fileType === "json") {
+                parseJSON(fileContent);
+            } else if (fileType === "csv") {
+                parseCSV(fileContent);
+            } else {
+                alert("Formato de archivo no soportado. Cargue un CSV o JSON.");
+            }
+            updateTable(headers, data);
+        }
+
+        function parseCSV(fileContent) {
+            const rows = fileContent.split('\n');
+            headers = rows[0].split(',').map(header => header.trim());
+
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i].split(',');
+                if (cols.length === headers.length) {
+                    const rowData = cols.map(value => value.trim());
+                    data.push(rowData);
+                }
+            }
+            console.log("Datos cargados desde CSV:", data);
+        }
+
+        function parseJSON(fileContent) {
+            const jsonData = JSON.parse(fileContent);
+            headers = Object.keys(jsonData[0]);
+
+            jsonData.forEach(item => {
+                const rowData = headers.map(key => item[key]);
+                data.push(rowData);
+            });
+            console.log("Datos cargados desde JSON:", data);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const fileContent = e.target.result;
+                    const fileType = file.type === "application/json" ? "json" : "csv";
+                    loadFileData(fileContent, fileType);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Función para entrenar el modelo con los datos cargados
+        document.getElementById('trainButton').onclick = function () {
+            if (data.length === 0) {
+                alert("Cargue datos primero.");
+                return;
+            }
+
+            // Añadir encabezados como primera fila de datos antes de entrenar el modelo
+            const dataWithHeaders = [headers, ...data];
+            console.log('dataWithHeaders ' + dataWithHeaders)
+            decisionTreeModel = new DecisionTreeID3(dataWithHeaders);
+            console.log('decisionTreeModel.dataset ' + decisionTreeModel.dataset)
+            const root = decisionTreeModel.train(decisionTreeModel.dataset);
+            console.log('Modelo entrenado, root:', root);
+            document.getElementById('logText').innerText = "Modelo de Árbol de Decisión entrenado con éxito.";
+        };
+
+        // Función para mostrar el árbol de decisión
+        document.getElementById('showTreeButton').onclick = function () {
+            if (!decisionTreeModel) {
+                alert("Entrene el modelo primero.");
+                return;
+            }
+
+            const root = decisionTreeModel.train(decisionTreeModel.dataset);
+            const dotStr = decisionTreeModel.generateDotString(root);
+            const parsDot = vis.network.convertDot(dotStr);
+            const data = {
+                nodes: parsDot.nodes,
+                edges: parsDot.edges
+            };
+            const options = {
+                layout: {
+                    hierarchical: {
+                        levelSeparation: 100,
+                        nodeSpacing: 100,
+                        parentCentralization: true,
+                        direction: 'UD', // UD, DU, LR, RL
+                        sortMethod: 'directed',
+                    },
+                },
+            };
+            var network = new vis.Network(document.getElementById("tree"), data, options);
+        };
+
+        // Función para actualizar la tabla con datos
+        function updateTable(headers, data) {
+            const dataTableHead = document.getElementById('dataTable').querySelector('thead tr');
+            const dataTableBody = document.getElementById('dataBody');
+
+            dataTableHead.innerHTML = '';
+            dataTableBody.innerHTML = '';
+
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.innerText = header;
+                dataTableHead.appendChild(th);
+            });
+
+            data.forEach(row => {
+                const tableRow = document.createElement('tr');
+                row.forEach(cellValue => {
+                    const cell = document.createElement('td');
+                    cell.innerText = cellValue;
+                    tableRow.appendChild(cell);
+                });
+                dataTableBody.appendChild(tableRow);
+            });
+        }
+
+        // Función testWithChart para realizar predicciones
+        const testWithChart = () => {
+            if (!decisionTreeModel) {
+                alert("Entrene el modelo primero.");
+                return;
+            }
+
+            var arrHeader = headers;
+            console.log('arrHeader ' + arrHeader)
+            var arrData = [arrHeader]
+            var training = data;
+
+            const dtSt = [headers, ...data];
+            let dTree = new DecisionTreeID3(dtSt);
+            console.log(dTree.dataset)
+            let root = dTree.train(dTree.dataset);
+
+            console.log(root);
+            var pred = document.getElementById('data').value;
+            var arrPred = pred.split(",")
+            var predHeader = []
+            for (var i = 0; i < arrHeader.length - 1; i++) {
+                predHeader.push(arrHeader[i])
+            }
+            let predict = pred != "" ? dTree.predict([predHeader, arrPred], root) : null;
+            return {
+                dotStr: dTree.generateDotString(root),
+                predictNode: predict
+            };
+        };
+
+        // Método para realizar la predicción
+        document.getElementById('predict').onclick = function () {
+            var chart = document.getElementById("tree");
+            var { dotStr, predictNode } = testWithChart();
+
+            if (predictNode != null) {
+                document.getElementById('prediction').innerText = headers[headers.length - 1] + ": " + predictNode.value;
+            } else {
+                document.getElementById('prediction').innerText = "No se pudo realizar la predicción.";
+            }
+
+            var parsDot = vis.network.convertDot(dotStr);
+            var data = {
+                nodes: parsDot.nodes,
+                edges: parsDot.edges
+            };
+            var options = {
+                layout: {
+                    hierarchical: {
+                        levelSeparation: 100,
+                        nodeSpacing: 100,
+                        parentCentralization: true,
+                        direction: 'UD', // UD, DU, LR, RL
+                        sortMethod: 'directed',
+                    },
+                },
+            };
+            var network = new vis.Network(chart, data, options);
+        };
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regresión Lineal</title>
+    <script type="text/javascript" src="../dist/tytus.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4a70b2;
+        }
+
+        #log {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        #chart_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+        }
+
+        #table_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #5c85d6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
+        <h1>Regresión Lineal</h1>
+    </div>
+
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 90%;">
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
+
+
+                <!-- Parametrización -->
+                <div style="width: 80%;">
+                    <!-- Seleccionador de archivos (CSV o JSON) -->
+                    <label for="fileInput">Cargar archivo (CSV o JSON):</label>
+                    <input type="file" id="fileInput" accept=".csv, .json">
+                    <label for="trainPercentage">Porcentaje de Train Data:</label>
+                    <input type="number" id="trainPercentage" min="0" max="100" step="1" value="80">
+                </div>
+                <div style="width: 60%; margin: 5px;">
+                    <button id="trainButton">Entrenar Modelo</button>
+                    <button id="showGraphButton">Ver Gráfica</button>
+
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
+                <div style="width: 95%;">
+                    <label for="newXValue">Nuevo valor de X para predicción:</label>
+                    <input type="number" id="newXValue" placeholder="Ej. 10">
+                </div>
+
+                <div style="width: 95%;">
+                    <label for="predictedValue">Valor Predicho:</label>
+                    <input type="text" id="predictedValue" placeholder="Valor de Y" disabled>
+                </div>
+                <div style="width: 80%;">
+                    <button id="predictButton">Predecir</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div style="width: 100%; display:flex; justify-content: center;">
+        <div id="table_div" style="width: 40%;">
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>X Train</th>
+                        <th>Y Train</th>
+                        <th>Y Predict</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Los resultados se agregarán aquí dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <div id="chart_div" style="width: 60%;"></div>
+    </div>
+
+    <div style="width: 100%; display:flex; justify-content: center;">
+        <div style="width: 50%;">
+            <h2>Predicted Data</h2>
+            <table id="displayTable" style="text-align: center; margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>X Base</th>
+                        <th>Y Predicted</th>
+                        <th>ERROR %</th>
+                    </tr>
+                </thead>
+                <tbody id="displayTableBody">
+                    <!-- Los resultados de la predicción se agregarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="text/javascript">
+        let xTrain = [];
+        let yTrain = [];
+        let linearModel;
+
+        // Función para procesar el archivo CSV
+        function parseCSV(fileContent) {
+            const rows = fileContent.split('\n');
+            for (let i = 1; i < rows.length; i++) { // Skip header row
+                const cols = rows[i].split(',');
+                if (cols.length >= 2) {
+                    xTrain.push(parseFloat(cols[0].trim()));
+                    yTrain.push(parseFloat(cols[1].trim()));
+                }
+            }
+            console.log("Datos cargados desde CSV:", xTrain, yTrain);
+        }
+
+        // Función para procesar el archivo JSON
+        function parseJSON(fileContent) {
+            const data = JSON.parse(fileContent);
+            data.forEach(item => {
+                if (item.x !== undefined && item.y !== undefined) {
+                    xTrain.push(item.x);
+                    yTrain.push(item.y);
+                }
+            });
+            console.log("Datos cargados desde JSON:", xTrain, yTrain);
+        }
+
+        // Manejar la carga del archivo
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const fileContent = e.target.result;
+                    if (file.type === "application/json") {
+                        parseJSON(fileContent);
+                    } else if (file.type === "text/csv") {
+                        parseCSV(fileContent);
+                    } else {
+                        alert("Formato de archivo no soportado. Cargue un CSV o JSON.");
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Función para entrenar el modelo
+        document.getElementById('trainButton').onclick = function () {
+            if (xTrain.length === 0 || yTrain.length === 0) {
+                alert("Cargue datos primero.");
+                return;
+            }
+
+            const trainPercentage = parseInt(document.getElementById('trainPercentage').value) / 100;
+            const splitIndex = Math.floor(xTrain.length * trainPercentage);
+
+            const xTrainSubset = xTrain.slice(0, splitIndex);
+            const yTrainSubset = yTrain.slice(0, splitIndex);
+
+            // Crear y entrenar el modelo de regresión lineal
+            linearModel = new LinearRegression();
+            linearModel.fit(xTrainSubset, yTrainSubset);
+
+            // Realizar predicción sobre todo el conjunto de entrenamiento
+            const yPredict = linearModel.predict(xTrain);
+
+            // Mostrar resultados en la tabla
+            updateResultsTable(xTrain, yTrain, yPredict);
+            updateDisplayTable(xTrain, yTrain, yPredict); // Llama a la función para actualizar la tabla de predicción
+        };
+
+        // Función para predecir con un nuevo valor de X
+        document.getElementById('predictButton').onclick = function () {
+            const newX = parseFloat(document.getElementById('newXValue').value);
+            if (linearModel) {
+                const predictedY = linearModel.predict([newX]);
+
+                // Mostrar el valor de la predicción en el input inhabilitado
+                document.getElementById("predictedValue").value = predictedY;
+            } else {
+                alert("Primero entrena el modelo.");
+            }
+        };
+
+        // Función para mostrar el gráfico
+        document.getElementById('showGraphButton').onclick = function () {
+            if (linearModel) {
+                const yPredict = linearModel.predict(xTrain);
+                const data = joinArrays('x', xTrain, 'yTrain', yTrain, 'yPredict', yPredict);
+                google.charts.load('current', { 'packages': ['corechart'] });
+                google.charts.setOnLoadCallback(() => drawChart(data));
+            } else {
+                alert("Primero entrena el modelo.");
+            }
+        };
+
+        // Función para actualizar la tabla de resultados
+        function updateResultsTable(x, y, yPred) {
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = ''; // Limpiar la tabla
+
+            for (let i = 0; i < x.length; i++) {
+                const row = resultsBody.insertRow();
+                const cellX = row.insertCell(0);
+                const cellY = row.insertCell(1);
+                const cellYPred = row.insertCell(2);
+
+                cellX.innerText = x[i];
+                cellY.innerText = y[i];
+                cellYPred.innerText = yPred[i];
+            }
+        }
+
+        // Función para actualizar la tabla de predicción
+        function updateDisplayTable(x, y, yPred) {
+            const displayBody = document.getElementById('displayTableBody');
+            displayBody.innerHTML = ''; // Limpiar la tabla
+
+            for (let i = 0; i < x.length; i++) {
+                const error = ((yPred[i] - y[i]) / y[i]) * 100;
+                const row = displayBody.insertRow();
+                const cellXBase = row.insertCell(0);
+                const cellYPredicted = row.insertCell(1);
+                const cellError = row.insertCell(2);
+
+                cellXBase.innerText = x[i];
+                cellYPredicted.innerText = yPred[i].toFixed(2); // Muestra 2 decimales
+                cellError.innerText = error.toFixed(2) + "%"; // Muestra 2 decimales
+            }
+        }
+
+        // Función para dibujar el gráfico
+        function drawChart(data) {
+            const dataTable = google.visualization.arrayToDataTable(data);
+            const options = {
+                title: 'Gráfica de Regresión Lineal',
+                hAxis: { title: 'X', minValue: 0 },
+                vAxis: { title: 'Y', minValue: 0 },
+                legend: { position: "bottom" },
+            };
+
+            const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+        }
+
+        // Función para unir los arrays en una estructura adecuada para Google Charts
+        function joinArrays(labelX, arrX, labelYTrain, arrYTrain, labelYPred, arrYPred) {
+            const data = [[labelX, labelYTrain, labelYPred]];
+            for (let i = 0; i < arrX.length; i++) {
+                data.push([arrX[i], arrYTrain[i], arrYPred[i]]);
+            }
+            return data;
+        }
+    </script>
+</body>
+
+</html>
