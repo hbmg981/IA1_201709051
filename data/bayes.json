@@ -1,0 +1,72 @@
+[
+    {
+        "clima": "soleado",
+        "temperatura": "calor",
+        "humedad": "alta",
+        "viento": "no",
+        "juega": "no"
+    },
+    {
+        "clima": "soleado",
+        "temperatura": "calor",
+        "humedad": "alta",
+        "viento": "si",
+        "juega": "no"
+    },
+    {
+        "clima": "nublado",
+        "temperatura": "calor",
+        "humedad": "alta",
+        "viento": "no",
+        "juega": "si"
+    },
+    {
+        "clima": "lluvioso",
+        "temperatura": "templado",
+        "humedad": "alta",
+        "viento": "no",
+        "juega": "si"
+    },
+    {
+        "clima": "lluvioso",
+        "temperatura": "frio",
+        "humedad": "normal",
+        "viento": "no",
+        "juega": "si"
+    },
+    {
+        "clima": "lluvioso",
+        "temperatura": "frio",
+        "humedad": "normal",
+        "viento": "si",
+        "juega": "no"
+    },
+    {
+        "clima": "nublado",
+        "temperatura": "frio",
+        "humedad": "normal",
+        "viento": "si",
+        "juega": "si"
+    },
+    {
+        "clima": "soleado",
+        "temperatura": "templado",
+        "humedad": "alta",
+        "viento": "no",
+        "juega": "no"
+    },
+    {
+        "clima": "soleado",
+        "temperatura": "frio",
+        "humedad": "normal",
+        "viento": "no",
+        "juega": "si"
+    },
+    {
+        "clima": "lluvioso",
+        "temperatura": "templado",
+        "humedad": "normal",
+        "viento": "no",
+        "juega": "si"
+    }
+]

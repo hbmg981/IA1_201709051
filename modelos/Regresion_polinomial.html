@@ -44,12 +44,10 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
         }
 
-        h2 {
-            color: #333;
+        .titles{
+            color: #333 !important;
         }
 
         label {
@@ -121,7 +119,7 @@
 
 <body>
     <center>
-        <h1>Regresión Polinomial</h1>
+        <h1 class="titles">Regresión Polinomial</h1>
         <div style="width: 100%; justify-content: center; display: flex; flex-wrap: wrap;">
             <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
                 <div class="file-input" style="width: 60%;">
@@ -131,7 +129,7 @@
                     </div>
                 </div>
                 <div style="width: 90%;">
-                    <h2>Datos</h2>
+                    <h2 class="titles">Datos</h2>
                     <table style="width: 60%; margin: auto;">
                         <tr>
                             <th>X Train</th>
@@ -145,10 +143,10 @@
             </div>
         </div>
 
-        <div style="display: flex; justify-content: center; width: 80%;">
+        <div style="display: flex; justify-content: center; width: 80%; margin: 30px;">
             <div style="width: 60%;">
-                <h2>Configuraciones</h2>
-                <div style="width: 60%; font-size: 1em; margin: 15px 0;">
+                <h2 class="titles">Configuraciones</h2>
+                <div style="width: 50%; font-size: 1em; margin: 15px 0;">
                     <label for="degree" style="font-weight: bold; font-size: 1em;">Grado del Polinomio:</label>
                     <select id="degree"
                         style="width: 100%; padding: 10px; font-size: 1.2em; border-radius: 5px; border: 1px solid #ccc;">
@@ -158,7 +156,7 @@
                     </select>
                 </div>
 
-                <div style="width: 50%;">
+                <div style="width: 55%;">
                     <button id="trainButton">Entrenar Modelo</button>
                     <button id="viewChartButton">Ver Gráfica</button>
                 </div>
@@ -189,7 +187,7 @@
 
             <div style="width: 45%;">
                 <div style="width: 100%; display: flex; justify-content: flex-end; flex-wrap: wrap;">
-                    <h2 style="width: 90%;">Datos Predichos</h2>
+                    <h2 class="titles" style="width: 90%;">Datos Predichos</h2>
                     <table id="displayTable" style="width: 98%;">
                         <thead>
                             <tr>
@@ -218,7 +216,7 @@
                 </table>
             </div>
             <div style="width: 55%; display: flex; justify-content: center; flex-wrap: wrap;">
-                <h2>Gráfica de Regresión Polinomial</h2>
+                <h2 class="titles">Gráfica de Regresión Polinomial</h2>
                 <div id="curve_chart"></div>
             </div>
         </div>

@@ -1,46 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú de Modelos</title>
     <style>
-        body {
+         body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 80vh;
+            min-height: 100vh;
+            min-height: 1300px;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333; /* Color de texto general */
+            background-color: #13164d;
+            color: #333;
+            padding-top: 20px;
         }
 
-        h1 {
-            margin-bottom: 5px;
-            color: #333; /* Color del título */
-        }
-
+        h1,
         h2 {
+            color: #4bfff9;
             margin: 0;
-            color: #333; /* Color de los subtítulos */
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .title-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+            gap: 10px;
         }
 
         nav {
-            margin: 20px 0;
-            padding: 20px;
+            margin: 20px;
+            padding: 10px;
             background-color: #ffffff;
-            border: 2px solid #b69ad09c; /* Marco lila */
+            border: 2px solid #b69ad09c;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            width: 40%;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        label {
+            color: #555;
+            font-size: 14px;
         }
 
         select {
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
-            border: 1px solid #892be24a; /* Borde lila */
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #892be24a;
             border-radius: 4px;
         }
 
@@ -48,26 +67,51 @@
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #8907a3ba; /* Color de fondo lila */
-            color: white; /* Color del texto en el botón */
+            background-color: #5c85d6;
+            color: white;
             border: none;
             border-radius: 4px;
             transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #7a1d9e; /* Color más oscuro al pasar el mouse */
+            background-color: #3b1d9e;
+        }
+
+        #modelContent {
+            width: 90%;
+            background-color: #E0E6ED;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         p {
-            color: #555; /* Color del texto */
+            color: #555;
+            margin: 15px 0 5px;
         }
+
+        iframe {
+            width: 90%; 
+            height: 1000px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none; /* Ocultamos el iframe inicialmente */
+            background-color: #E0E6ED;
+        }
+
     </style>
 </head>
+
 <body>
-    <h1>Modelos de Machine Learning Utilizando Tytus.js</h1>
-    <h2>Laboratorio de Inteligencia Artificial 1</h2>
-    <h2>201709051</h2>
+    <div class="title-container">
+        <h1 style="width: 100%;">Modelos de Machine Learning Utilizando Tytus.js</h1>
+        <h2 style="width: 100%; color: #ffffff;">Laboratorio de Inteligencia Artificial 1</h2>
+        <h2 style="width: 100%; color: #ffb3b3;">201709051</h2>
+    </div>
+
     <nav>
         <label for="modelSelect">Selecciona un modelo:</label>
         <select id="modelSelect">
@@ -75,22 +119,36 @@
             <option value="modelos/Regresion_lineal.html">Regresión Lineal</option>
             <option value="modelos/Regresion_polinomial.html">Regresión Polinomial</option>
             <option value="modelos/Arbol_decision.html">Árbol de Decisión</option>
+            <option value="modelos/Naive_Bayes.html">Naive Bayes</option>
+            <option value="modelos/Redes_neuronales.html">Redes Neuronales</option>
+            <option value="modelos/Kmeans.html">K-Means</option>
+            <option value="modelos/Knearest.html">K-Nearest Neighbor</option>
         </select>
-        <button onclick="goToModel()">Ver Modelo</button>
+        <button style="width: 120px;" onclick="loadModel()">Ver Modelo</button>
     </nav>
 
-    <p>Selecciona un modelo para verlo en una nueva pestaña.</p>
+    <div id="modelContent">
+        <p>Selecciona un modelo para verlo aquí.</p>
+    </div>
+
+    <iframe id="modelIframe" src=""></iframe>
 
     <script>
-        function goToModel() {
+        function loadModel() {
             const select = document.getElementById('modelSelect');
             const selectedValue = select.value;
+            const modelIframe = document.getElementById('modelIframe');
+
             if (selectedValue) {
-                window.open(selectedValue, '_blank');
+                modelIframe.src = selectedValue;
+                modelIframe.style.display = 'block'; // Mostramos el iframe
+                document.getElementById('modelContent').style.display = 'none'; // Ocultamos el div
             } else {
                 alert("Por favor, selecciona un modelo.");
+                modelIframe.style.display = 'none'; // Ocultamos el iframe si no hay selección
             }
         }
     </script>
 </body>
+
 </html>

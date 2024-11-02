@@ -8,16 +8,14 @@
     <script type="text/javascript" src="../dist/tytus.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js"></script>
     <style>
+
+        .titles {
+            color: #333;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-
-        h1,
-        h2 {
-            color: #333;
         }
 
         label {
@@ -27,6 +25,7 @@
         }
 
         input[type="file"],
+        input[type="text"],
         button {
             padding: 10px;
             margin-top: 5px;
@@ -88,7 +87,7 @@
 
 <body>
     <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
-        <h1>Árbol de Decisión</h1>
+        <h1 class="titles">Árbol de Decisión</h1>
     </div>
 
     <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%; margin: 40px;">
@@ -107,7 +106,7 @@
                 <!-- Input para la predicción -->
                 <label>Predict</label>
                 <br>
-                <input style="width: 80%;" id="data" type="text" placeholder="Insert data">
+                <input style="width: 80%;" id="data" type="text" placeholder="Ingresa los datos para predicciones">
                 <br><br>
                 <!-- Botón para ejecutar la predicción -->
                 <button id="predict">Predecir con los datos insertados</button>
@@ -119,12 +118,12 @@
     </div>
     <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 100%;">
         <div id="log" style="width: 80%;">
-            <h2>Resultado</h2>
+            <h2 class="titles">Resultado</h2>
             <p id="logText">Resultado de entrenamiento.</p>
         </div>
 
         <div id="table_div" style="width: 80%;">
-            <h2>Datos de Entrenamiento</h2>
+            <h2 class="titles">Datos de Entrenamiento</h2>
             <table id="dataTable">
                 <thead>
                     <tr>

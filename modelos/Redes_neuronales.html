@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redes Neuronales</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js"></script>
+    <script type="text/javascript" src="../dist/tytus.js"></script>
+
+    <style>
+        /* Estilos proporcionados */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: transparent;
+        }
+
+        .titles {
+            color: #333 !important;
+        }
+
+        input[type="text"],
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 50%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+            width:80%;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #4a70b2;
+        }
+
+        .container {
+            margin-top: 20px;
+            width: 60%;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .pnlPrincipal {
+            justify-content: center;
+            display: flex;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="pnlPrincipal">Redes Neuronales</h1>
+    <center>
+        <div class="container">
+            <h3>Datos para Predecir</h3>
+            <div class="input-group">
+                <label for="input1" class="input-group-text">Primer número:</label>
+                <input type="text" id="input1" class="form-control" placeholder="Ingrese el primer número" />
+                <label for="input2" class="input-group-text">Segundo número:</label>
+                <input type="text" id="input2" class="form-control" placeholder="Ingrese el segundo número" />
+            </div>
+            <button type="button" onclick="makePrediction()">Predecir</button>
+
+            <div class="input-group">
+                <label>Probabilidad de que el primer número sea diferente del segundo:</label>
+                <input type="text" id="Resultado" class="form-control" disabled />
+            </div>
+            <br>
+            <h3>Datos para Test 2</h3>
+            <div class="input-group">
+                <label for="input3" class="input-group-text">Primer número (Test 2):</label>
+                <input type="text" id="input3" class="form-control" placeholder="Ingrese el primer número" />
+                <label for="input4" class="input-group-text">Segundo número (Test 2):</label>
+                <input type="text" id="input4" class="form-control" placeholder="Ingrese el segundo número" />
+            </div>
+            <button type="button" onclick="makePrediction2()">Predecir (Test 2)</button>
+
+            <div class="input-group">
+                <label>Probabilidad de que el primer número sea igual al segundo:</label>
+                <input type="text" id="Resultado2" class="form-control" disabled />
+            </div>
+        </div>
+    </center>
+
+    <script>
+        let arreglodesignado = [2, 4, 3, 2];
+        let redNeural = new NeuralNetwork(arreglodesignado);
+
+        // Entrenar red neuronal para el primer caso
+        for (let i = 0; i < 10000; i++) {
+            let numero1 = Math.random();
+            let numero2 = Math.random();
+            redNeural.Entrenar([numero1, numero2], (numero1 != numero2 ? [1, 0] : [0, 1]));
+        }
+
+        // Entrenar red neuronal para el segundo caso
+        let redNeural2 = new NeuralNetwork(arreglodesignado);
+        for (let i = 0; i < 10000; i++) {
+            let numero1 = Math.random();
+            let numero2 = Math.random();
+            redNeural2.Entrenar([numero1, numero2], (numero1 == numero2 ? [1, 0] : [0, 1]));
+        }
+
+        function makePrediction() {
+            let numero1 = parseFloat(document.getElementById("input1").value);
+            let numero2 = parseFloat(document.getElementById("input2").value);
+            let prediction = redNeural.Predecir([numero1, numero2]);
+            document.getElementById("Resultado").value = prediction.join(", ");
+        }
+
+        function makePrediction2() {
+            let numero1 = parseFloat(document.getElementById("input3").value);
+            let numero2 = parseFloat(document.getElementById("input4").value);
+            let prediction = redNeural2.Predecir([numero1, numero2]);
+            document.getElementById("Resultado2").value = prediction.join(", ");
+        }
+    </script>
+</body>
+
+</html>

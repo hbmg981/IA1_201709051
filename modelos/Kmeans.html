@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <title>Algoritmo K-means</title>
+    <script type="text/javascript" src="../dist/tytus.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: transparent;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            background: transparent;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"],
+        button {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #4a70b2;
+        }
+        #datos {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .label {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #5c85d6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modelo K-Means</h1>
+        <input type="file" id="fileInput" accept=".json, .csv" />
+        <center style="width: 100%; display: flex; gap: 20px;">
+        <button id="loadButton">Cargar Datos</button>
+        <button id="clearButton">Limpiar Datos</button>
+        </center>
+        <div class="label" id="loadLabel"></div>
+        <button id="executeButton" disabled>Ejecutar K-Means</button>
+        
+        <center>
+            <canvas id="grafica" width="600" height="600"></canvas>
+        </center>
+        <div id="datos"></div>
+    </div>
+
+    <script type="text/javascript">
+        let data = []; // Variable global para almacenar los datos cargados
+
+        // Evento para cargar datos desde el archivo seleccionado
+        document.getElementById("loadButton").addEventListener("click", function () {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            const loadLabel = document.getElementById("loadLabel");
+
+            if (!file) {
+                loadLabel.textContent = "Por favor, selecciona un archivo.";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const contents = event.target.result;
+                data = []; // Limpiar datos anteriores
+
+                if (file.type === "application/json") {
+                    const jsonData = JSON.parse(contents);
+                    data = jsonData.map(item => [
+                        parseFloat(item[Object.keys(item)[0]]), 
+                        parseFloat(item[Object.keys(item)[1]])
+                    ]);
+                } else {
+                    const rows = contents.split("\n");
+                    for (let i = 1; i < rows.length; i++) { // Ignorar encabezados
+                        const cols = rows[i].split(",");
+                        if (cols.length >= 2) {
+                            data.push([parseFloat(cols[0]), parseFloat(cols[1])]);
+                        }
+                    }
+                }
+
+                if (data.length > 0) {
+                    loadLabel.textContent = "Datos cargados correctamente.";
+                    document.getElementById("executeButton").disabled = false; // Habilitar el botón de ejecutar
+                } else {
+                    loadLabel.textContent = "No se encontraron datos válidos en el archivo.";
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Evento para ejecutar K-Means con los datos cargados
+        document.getElementById("executeButton").addEventListener("click", function () {
+            if (data.length === 0) {
+                alert("Por favor, carga los datos primero.");
+                return;
+            }
+
+            const kmeans = new G8_Kmeans({
+                canvas: document.getElementById('grafica'),
+                data: data,
+                k: 4
+            });
+
+            const datosDiv = document.getElementById("datos");
+            datosDiv.innerHTML = ""; // Limpiar resultados anteriores
+
+            // Crear tabla para mostrar los datos de los centroides
+            const table = document.createElement("table");
+            const headerRow = document.createElement("tr");
+            const th1 = document.createElement("th");
+            th1.textContent = "Cluster";
+            const th2 = document.createElement("th");
+            th2.textContent = "Centroide";
+            headerRow.appendChild(th1);
+            headerRow.appendChild(th2);
+            table.appendChild(headerRow);
+
+            // Llenar la tabla con la información de cada cluster
+            kmeans.means.forEach((mean, index) => {
+                const row = document.createElement("tr");
+                const clusterCell = document.createElement("td");
+                clusterCell.textContent = `Cluster ${index}`;
+                const centroideCell = document.createElement("td");
+                centroideCell.textContent = mean.toString();
+                row.appendChild(clusterCell);
+                row.appendChild(centroideCell);
+                table.appendChild(row);
+            });
+
+            datosDiv.appendChild(table);
+        });
+
+        // Evento para limpiar los datos y restablecer el estado inicial
+        document.getElementById("clearButton").addEventListener("click", function () {
+            document.getElementById("fileInput").value = ""; // Limpiar la selección del archivo
+            document.getElementById("loadLabel").textContent = ""; // Limpiar el mensaje de carga
+            document.getElementById("datos").innerHTML = ""; // Limpiar la tabla de datos
+            document.getElementById("executeButton").disabled = true; // Deshabilitar el botón de ejecutar
+            data = []; // Limpiar el array de datos
+            const canvas = document.getElementById("grafica");
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+        });
+    </script>
+</body>
+</html>

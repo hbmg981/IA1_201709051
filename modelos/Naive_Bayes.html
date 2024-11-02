@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="../dist/tytus.js"></script>
+    <style>
+        /* Estilos proporcionados */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .titles {
+            color: #333 !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #5c85d6;
+            color: white;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #892be24a;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #5c85d6;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4a70b2;
+        }
+
+        #table_div {
+            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>Naive Bayes</h1>
+
+        <h3>Carga de Datos</h3>
+    </center>
+
+    <div style="width: 100%; justify-content: center; display: flex; flex-wrap: wrap;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; width: 50%;">
+            <div class="file-input" style="width: 60%;">
+                <div style="width: 90%;">
+                    <input type="file" id="fileInput" accept=".json, .csv" />
+                    <button id="loadButton">Entrenar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <center>
+        <center style="width: 50%;">
+
+            <h3>Datos del Entrenamiento</h3>
+            <div id="table_div">
+                <table id="tabla" border="1"></table>
+            </div>
+
+            <h3>Predecir</h3>
+            <select name="effect" id="effect_dropdown"></select>
+
+            <h3>Condiciones</h3>
+            <div id="events"></div><br>
+            <button type="button" onclick="Predict()">PREDECIR</button>
+
+            <h3>Resultado: </h3>
+            <div style="width: 100%; display: flex; gap: 20px;">
+                <h3 id="predict_lbl"></h3>
+                <input type="text" id="predict_result" disabled />
+            </div>
+
+            <br>
+            <br>
+        </center>
+    </center>
+
+    <script>
+        let targetVariable; // Variable global para la variable objetivo
+
+        document.getElementById("loadButton").addEventListener("click", function () {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Por favor, selecciona un archivo.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const contents = event.target.result;
+                let jsonData = [];
+                let headers; // Declarar headers aquí para que sea accesible
+
+                if (file.type === "application/json") {
+                    jsonData = JSON.parse(contents); // Los datos están en el nivel raíz
+                    headers = Object.keys(jsonData[0]); // Obtener los encabezados del JSON
+                } else {
+                    const rows = contents.split("\n");
+                    headers = rows[0].split(",");
+                    for (let i = 0; i < rows.length; i++) {
+                        const cols = rows[i].split(",");
+                        const obj = {};
+                        headers.forEach((header, index) => {
+                            obj[header.trim()] = cols[index] ? cols[index].trim() : null; // Limpiar espacios
+                        });
+                        jsonData.push(obj);
+                    }
+                }
+
+                if (jsonData.length > 0) {
+                    initializeNaiveBayes(jsonData);
+                    displayData(jsonData);
+                } else {
+                    alert("No se encontraron datos válidos en el archivo.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function initializeNaiveBayes(data) {
+            var names = Object.keys(data[0]); // Obtener encabezados de los datos
+            var naive = new NaiveBayes();
+
+            // Inicializar arrays para las causas
+            var causesData = {};
+            names.forEach(name => {
+                causesData[name] = []; // Inicializar el array para cada causa
+            });
+
+            data.forEach(item => {
+                names.forEach(name => {
+                    causesData[name].push(item[name]); // Llenar los arrays
+                });
+            });
+
+            // Insertar causas en el modelo
+            for (const name of names) {
+                naive.insertCause(name, causesData[name]);
+            }
+
+            window.naive = naive; // Hacer accesible la variable naive a la función Predict
+            return names; // Devolver los nombres para usarlos más tarde
+        }
+
+        function displayData(data) {
+            var table = "<tr><th>" + Object.keys(data[0]).join("</th><th>") + "</th></tr>";
+
+            data.forEach(item => {
+                table += "<tr><td>" + Object.values(item).join("</td><td>") + "</td></tr>";
+            });
+
+            document.getElementById("tabla").innerHTML = table;
+
+            // Configuración del dropdown
+            var names = Object.keys(data[0]); // Obtener encabezados nuevamente
+            var drop = "";
+            names.forEach(name => {
+                drop += "<option value=\"" + name + "\">" + name + "</option>"; // Llenar todas las opciones
+            });
+            document.getElementById("effect_dropdown").innerHTML = drop;
+
+            // Configuración de los inputs de causas
+            var event_causes = "<table>";
+            names.forEach((cause, index) => {
+                event_causes += "<tr><td><label id=label_" + (index + 1) + ">" + cause + "</label></td><td>";
+                event_causes += "<select name=\"cause\" id=\"cause" + (index + 1) + "_dropdown\">";
+                var events = Array.from(new Set(data.map(item => item[cause]))); // Obtener eventos únicos
+                event_causes += "<option value=\"\">- - -</option>"
+                events.forEach(event => {
+                    event_causes += "<option value=\"" + event + "\">" + event + "</option>";
+                });
+                event_causes += "</select></td></tr>";
+            });
+            event_causes += "</table>";
+            document.getElementById("events").innerHTML = event_causes;
+        }
+
+        function Predict() {
+            var effect = document.getElementById("effect_dropdown").value;
+            let my_causes = [];
+
+            for (let index = 0; index < window.naive.causes.length; index++) {
+                let id = index + 1;
+                let labelElement = document.getElementById("label_" + id);
+                if (labelElement) {
+                    let label_text = labelElement.innerText;
+                    let causeDropdown = document.getElementById("cause" + id + "_dropdown");
+                    if (causeDropdown && causeDropdown.value) {
+                        my_causes.push([label_text, causeDropdown.value]);
+                    }
+                }
+            }
+
+            // Verificar que se pasen todas las causas
+            console.log("Efecto: ", effect);
+            console.log("Causas: ", my_causes);
+
+            var prediction = naive.predict(effect, my_causes);
+            document.getElementById("predict_lbl").innerHTML = prediction[0];
+            document.getElementById("predict_result").value = prediction[1];
+        }
+
+
+    </script>
+</body>
+
+</html>
