@@ -7,13 +7,13 @@
 Este manual técnico describe varios modelos de Machine Learning implementados utilizando Tytus.js. Cada modelo se presenta con su respectiva teoría, método de aplicación y una tabla de parámetros y datos de entrada.
 
 ## Índice
-1. [Regresión Lineal](#regresion-lineal)
-2. [Regresión Polinomial](#regresion-polinomial)
-3. [Árbol de Decisión](#arbol-de-decision)
-4. [Naive Bayes](#naive-bayes)
-5. [Redes Neuronales](#redes-neuronales)
-6. [K-Means](#k-means)
-7. [K-Nearest Neighbor](#k-nearest-neighbor)
+1. [Regresión Lineal](#1-regresión-lineal)
+2. [Regresión Polinomial](#2-regresión-polinomial)
+3. [Árbol de Decisión](#3-árbol-de-decisión)
+4. [Redes Neuronales](#4-redes-neuronales)
+5. [Naive Bayes](#5-naive-bayes)
+6. [K-Means](#6-k-means)
+7. [K-Nearest Neighbor](#7-k-nearest-neighbor)
 
 ---
 
